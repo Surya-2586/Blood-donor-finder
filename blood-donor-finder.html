@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulseLink — Blood Donor Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F0EA;
+    --panel:#FFFFFF;
+    --line:#DEDACE;
+    --line-soft:#E9E6DC;
+    --ink:#182430;
+    --ink-dim:#5A6672;
+    --ink-faint:#9AA3AB;
+    --crimson:#C8102E;
+    --crimson-dark:#9A0C23;
+    --teal:#1F6F63;
+    --amber:#C97B2E;
+    --display:'Barlow Condensed', sans-serif;
+    --sans:'Inter', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding:28px 20px 90px;
+    min-height:100vh;
+  }
+  .wrap{max-width:1200px;margin:0 auto;}
+
+  /* ---- Header ---- */
+  header{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:3px solid var(--ink);
+    padding-bottom:16px;margin-bottom:8px;gap:20px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark svg{width:38px;height:38px;display:block;}
+  .brand-text h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:30px;
+    letter-spacing:0.01em;
+    margin:0;
+    line-height:1;
+    text-transform:uppercase;
+  }
+  .brand-text p{margin:3px 0 0;font-size:12.5px;color:var(--ink-dim);letter-spacing:0.02em;}
+  .header-stats{display:flex;gap:22px;}
+  .hstat{text-align:right;}
+  .hstat .n{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;color:var(--crimson);}
+  .hstat .l{font-size:10px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;}
+
+  .disclaimer{
+    font-size:11.5px;
+    color:var(--ink-dim);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--amber);
+    padding:9px 14px;
+    margin:16px 0 26px;
+    line-height:1.5;
+  }
+
+  /* ---- Layout ---- */
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:20px;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:20px;
+  }
+  .panel + .panel{margin-top:18px;}
+  .panel-title{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    margin:0 0 14px;
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:8px;
+  }
+  .panel-title .idx{font-family:var(--mono);font-size:10px;color:var(--ink-faint);font-weight:500;letter-spacing:0.06em;}
+
+  /* ---- Forms ---- */
+  label{display:block;font-size:12px;color:var(--ink-dim);margin-bottom:6px;font-weight:500;}
+  .field{margin-bottom:14px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  input[type=text], input[type=tel], input[type=date], select, textarea{
+    width:100%;
+    background:var(--paper);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:13.5px;
+    padding:9px 10px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  textarea{resize:vertical;min-height:56px;font-family:var(--sans);}
+  input:focus, select:focus, textarea:focus{border-color:var(--crimson);}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-dim) 50%),linear-gradient(135deg,var(--ink-dim) 50%,transparent 50%);background-position:calc(100% - 15px) center,calc(100% - 10px) center;background-size:5px 5px,5px 5px;background-repeat:no-repeat;}
+  .check-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .check-row input{width:auto;}
+  .check-row label{margin:0;color:var(--ink);}
+
+  button.primary{
+    width:100%;background:var(--crimson);color:#fff;border:none;
+    font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:0.03em;
+    text-transform:uppercase;padding:11px;cursor:pointer;transition:background .15s;
+  }
+  button.primary:hover{background:var(--crimson-dark);}
+  button.secondary{
+    width:100%;background:var(--ink);color:#fff;border:none;
+    font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:0.03em;
+    text-transform:uppercase;padding:10px;cursor:pointer;
+  }
+  button.ghost{
+    background:transparent;border:1px solid var(--line);color:var(--ink-dim);
+    font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;
+    padding:7px 12px;cursor:pointer;
+  }
+  button.ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+
+  /* ---- Blood type stamp ---- */
+  .type-stamp{
+    font-family:var(--display);font-weight:700;
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:52px;height:40px;padding:0 8px;
+    border:2px solid currentColor;
+    font-size:19px;letter-spacing:0;
+    color:var(--crimson);
+    background:rgba(200,16,46,0.06);
+  }
+
+  /* ---- Urgent requests ---- */
+  .req-list{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;padding-right:2px;}
+  .req-card{
+    display:flex;gap:12px;align-items:flex-start;
+    border:1px solid var(--line);border-left:4px solid var(--ink-faint);
+    padding:11px 13px;background:var(--paper);
+  }
+  .req-card.critical{border-left-color:var(--crimson);}
+  .req-card.urgent{border-left-color:var(--amber);}
+  .req-body{flex:1;}
+  .req-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .req-top .loc{font-weight:600;font-size:13.5px;}
+  .req-top .tag{
+    font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:0.06em;
+    text-transform:uppercase;padding:2px 7px;color:#fff;
+  }
+  .tag.critical{background:var(--crimson);}
+  .tag.urgent{background:var(--amber);}
+  .tag.routine{background:var(--ink-dim);}
+  .req-meta{font-size:11.5px;color:var(--ink-dim);margin-top:3px;}
+  .req-notes{font-size:12px;color:var(--ink);margin-top:5px;line-height:1.4;}
+
+  /* ---- Donor result cards ---- */
+  .donor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:640px){ .donor-grid{grid-template-columns:1fr;} }
+  .donor-card{
+    border:1px solid var(--line);
+    padding:13px;
+    display:flex;gap:12px;
+  }
+  .donor-info{flex:1;min-width:0;}
+  .donor-name{font-weight:600;font-size:14.5px;}
+  .donor-city{font-size:12px;color:var(--ink-dim);margin-top:2px;}
+  .donor-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .pill{
+    font-family:var(--mono);font-size:10px;padding:2px 7px;
+    border:1px solid var(--line);color:var(--ink-dim);
+  }
+  .pill.avail{border-color:var(--teal);color:var(--teal);}
+  .pill.unavail{border-color:var(--ink-faint);color:var(--ink-faint);}
+  .donor-contact{font-family:var(--mono);font-size:11.5px;color:var(--ink);margin-top:8px;}
+
+  .empty-state{
+    text-align:center;padding:26px 10px;color:var(--ink-faint);
+    font-size:12.5px;font-family:var(--mono);
+  }
+
+  /* ---- Compatibility matrix ---- */
+  .compat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .compat-cell{
+    border:1px solid var(--line);padding:10px 8px;text-align:center;
+    cursor:default;
+  }
+  .compat-cell .t{font-family:var(--display);font-weight:700;font-size:17px;}
+  .compat-cell .d{font-size:9.5px;color:var(--ink-dim);margin-top:4px;line-height:1.4;font-family:var(--mono);}
+  .compat-note{font-size:11.5px;color:var(--ink-dim);margin-top:12px;line-height:1.5;}
+
+  /* ---- Registry table ---- */
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{
+    text-align:left;color:var(--ink-faint);font-weight:600;text-transform:uppercase;
+    letter-spacing:0.05em;font-size:10px;padding:0 10px 9px;border-bottom:2px solid var(--ink);
+    font-family:var(--mono);
+  }
+  td{padding:9px 10px;border-bottom:1px solid var(--line-soft);}
+  tr:last-child td{border-bottom:none;}
+
+  ::selection{background:var(--crimson);color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 40 40" fill="none">
+          <path d="M20 4 C20 4 8 18 8 26 C8 32.6 13.4 38 20 38 C26.6 38 32 32.6 32 26 C32 18 20 4 20 4 Z" fill="#C8102E"/>
+          <path d="M14 24 C14 28 16.5 30.5 20 31" stroke="#F2F0EA" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>PulseLink</h1>
+        <p>Blood Donor Network &amp; Compatibility Registry</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><div class="n" id="statDonors">0</div><div class="l">Registered</div></div>
+      <div class="hstat"><div class="n" id="statActive">0</div><div class="l">Active requests</div></div>
+      <div class="hstat"><div class="n" id="statCritical">0</div><div class="l">Critical</div></div>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    This is a community registry, not a hospital or blood-bank system — it does not verify eligibility or identity. Entries you submit (name, contact, blood type) are stored for this app and visible to everyone using it. Do not enter contact details you're not comfortable sharing publicly. For an actual urgent need, contact your local hospital or blood bank directly.
+  </div>
+
+  <div class="grid">
+    <!-- LEFT COLUMN -->
+    <div>
+      <div class="panel">
+        <p class="panel-title"><span>Register as Donor</span><span class="idx">01</span></p>
+        <div class="field"><label for="dName">Name</label><input type="text" id="dName" placeholder="Full name"></div>
+        <div class="field-row">
+          <div class="field"><label for="dType">Blood type</label>
+            <select id="dType">
+              <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+              <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+            </select>
+          </div>
+          <div class="field"><label for="dCity">City</label><input type="text" id="dCity" placeholder="e.g. Coimbatore"></div>
+        </div>
+        <div class="field"><label for="dContact">Contact (phone or email)</label><input type="text" id="dContact" placeholder="Visible to people searching"></div>
+        <div class="field"><label for="dLast">Last donation date (optional)</label><input type="date" id="dLast"></div>
+        <div class="check-row"><input type="checkbox" id="dAvail" checked><label for="dAvail">Currently available to donate</label></div>
+        <button class="primary" id="registerBtn">Add to Registry</button>
+      </div>
+
+      <div class="panel">
+        <p class="panel-title"><span>Find Donors</span><span class="idx">02</span></p>
+        <div class="field"><label for="sType">Blood type needed</label>
+          <select id="sType">
+            <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+            <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+          </select>
+        </div>
+        <div class="field"><label for="sCity">City</label><input type="text" id="sCity" placeholder="Leave blank for all cities"></div>
+        <div class="check-row"><input type="checkbox" id="sAvailOnly" checked><label for="sAvailOnly">Only show currently available</label></div>
+        <button class="secondary" id="searchBtn">Search Registry</button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div>
+      <div class="panel">
+        <p class="panel-title"><span>Urgent Requests</span><span class="idx">03 — LIVE BOARD</span></p>
+        <div class="field-row" style="margin-bottom:12px;">
+          <div class="field" style="margin-bottom:8px;"><label for="rType">Type needed</label>
+            <select id="rType">
+              <option>O-</option><option>O+</option><option>A-</option><option>A+</option>
+              <option>B-</option><option>B+</option><option>AB-</option><option>AB+</option>
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:8px;"><label for="rUrgency">Urgency</label>
+            <select id="rUrgency">
+              <option value="critical">Critical — within hours</option>
+              <option value="urgent">Urgent — within 1–2 days</option>
+              <option value="routine">Routine — planned need</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:8px;"><label for="rLoc">Hospital / location</label><input type="text" id="rLoc" placeholder="e.g. City General Hospital, Coimbatore"></div>
+        <div class="field"><label for="rNotes">Notes (optional)</label><textarea id="rNotes" placeholder="Contact person, ward, additional context..."></textarea></div>
+        <button class="primary" id="postReqBtn" style="margin-bottom:16px;">Post Request</button>
+
+        <div class="req-list" id="reqList"><div class="empty-state">No active requests posted yet.</div></div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-title"><span>Search Results</span><span class="idx" id="resultsIdx">04</span></p>
+        <div id="resultsBox"><div class="empty-state">Run a search to see matching, compatible donors.</div></div>
+      </div>
+
+      <div class="panel">
+        <p class="panel-title"><span>Compatibility Reference</span><span class="idx">05</span></p>
+        <div class="compat-grid" id="compatGrid"></div>
+        <div class="compat-note">O- is the universal donor and can give to any type. AB+ is the universal recipient and can receive from any type. Compatibility shown is for whole-blood red cell donation; plasma and platelet compatibility differ.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px;">
+    <p class="panel-title"><span>Full Donor Registry</span><span class="idx">06 — ALL ENTRIES</span></p>
+    <div id="registryBox"><div class="empty-state">No donors registered yet.</div></div>
+    <button class="ghost" id="clearBtn" style="margin-top:12px;">Clear all registry data</button>
+  </div>
+
+</div>
+
+<script>
+const COMPAT = {
+  'O-':  ['O-','O+','A-','A+','B-','B+','AB-','AB+'],
+  'O+':  ['O+','A+','B+','AB+'],
+  'A-':  ['A-','A+','AB-','AB+'],
+  'A+':  ['A+','AB+'],
+  'B-':  ['B-','B+','AB-','AB+'],
+  'B+':  ['B+','AB+'],
+  'AB-': ['AB-','AB+'],
+  'AB+': ['AB+']
+};
+const TYPES = ['O-','O+','A-','A+','B-','B+','AB-','AB+'];
+
+function canDonateTo(donorType, recipientType){
+  return COMPAT[donorType]?.includes(recipientType);
+}
+
+function buildCompatGrid(){
+  const grid = document.getElementById('compatGrid');
+  grid.innerHTML = TYPES.map(t=>{
+    return `<div class="compat-cell"><div class="t">${t}</div><div class="d">can give to<br>${COMPAT[t].join(', ')}</div></div>`;
+  }).join('');
+}
+buildCompatGrid();
+
+function daysBetween(dateStr){
+  const then = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now-then)/(1000*60*60*24));
+}
+function eligibilityLabel(lastDonation){
+  if(!lastDonation) return 'Eligible now';
+  const days = daysBetween(lastDonation);
+  if(days >= 56) return 'Eligible now';
+  const remain = 56-days;
+  return `Eligible in ~${remain}d`;
+}
+
+// ---------- Storage ----------
+async function loadList(key){
+  try{
+    const res = await window.storage.get(key, true);
+    return res ? JSON.parse(res.value) : [];
+  }catch(e){ return []; }
+}
+async function saveList(key, list){
+  try{
+    await window.storage.set(key, JSON.stringify(list), true);
+    return true;
+  }catch(e){ console.error('storage error', e); return false; }
+}
+
+let donors = [];
+let requests = [];
+
+function updateStats(){
+  document.getElementById('statDonors').textContent = donors.length;
+  document.getElementById('statActive').textContent = requests.length;
+  document.getElementById('statCritical').textContent = requests.filter(r=>r.urgency==='critical').length;
+}
+
+function renderRequests(){
+  const box = document.getElementById('reqList');
+  if(!requests.length){
+    box.innerHTML = '<div class="empty-state">No active requests posted yet.</div>';
+    return;
+  }
+  const order = {critical:0, urgent:1, routine:2};
+  const sorted = requests.slice().sort((a,b)=> order[a.urgency]-order[b.urgency] || b.ts-a.ts);
+  box.innerHTML = sorted.map(r=>{
+    return `<div class="req-card ${r.urgency}">
+      <span class="type-stamp" style="min-width:44px;height:34px;font-size:15px;">${r.type}</span>
+      <div class="req-body">
+        <div class="req-top">
+          <span class="loc">${escapeHtml(r.location)}</span>
+          <span class="tag ${r.urgency}">${r.urgency}</span>
+        </div>
+        <div class="req-meta">Posted ${r.date}</div>
+        ${r.notes ? `<div class="req-notes">${escapeHtml(r.notes)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRegistry(){
+  const box = document.getElementById('registryBox');
+  if(!donors.length){
+    box.innerHTML = '<div class="empty-state">No donors registered yet.</div>';
+    return;
+  }
+  const rows = donors.slice().reverse().map(d=>{
+    return `<tr>
+      <td>${escapeHtml(d.name)}</td>
+      <td><span class="type-stamp" style="min-width:40px;height:28px;font-size:13px;">${d.type}</span></td>
+      <td>${escapeHtml(d.city)}</td>
+      <td>${d.available ? '<span class="pill avail">Available</span>' : '<span class="pill unavail">Unavailable</span>'}</td>
+      <td>${eligibilityLabel(d.lastDonation)}</td>
+      <td>${escapeHtml(d.contact)}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table>
+    <thead><tr><th>Name</th><th>Type</th><th>City</th><th>Status</th><th>Eligibility</th><th>Contact</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderResults(list, searchedType){
+  const box = document.getElementById('resultsBox');
+  document.getElementById('resultsIdx').textContent = `04 — ${list.length} MATCH${list.length===1?'':'ES'}`;
+  if(!list.length){
+    box.innerHTML = '<div class="empty-state">No compatible donors found for these filters.</div>';
+    return;
+  }
+  box.innerHTML = `<div class="donor-grid">${list.map(d=>{
+    return `<div class="donor-card">
+      <span class="type-stamp">${d.type}</span>
+      <div class="donor-info">
+        <div class="donor-name">${escapeHtml(d.name)}</div>
+        <div class="donor-city">${escapeHtml(d.city)}</div>
+        <div class="donor-tags">
+          ${d.available ? '<span class="pill avail">Available</span>' : '<span class="pill unavail">Unavailable</span>'}
+          <span class="pill">${eligibilityLabel(d.lastDonation)}</span>
+          <span class="pill">Compatible with ${searchedType}</span>
+        </div>
+        <div class="donor-contact">${escapeHtml(d.contact)}</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+// ---------- Actions ----------
+document.getElementById('registerBtn').addEventListener('click', async ()=>{
+  const name = document.getElementById('dName').value.trim();
+  const type = document.getElementById('dType').value;
+  const city = document.getElementById('dCity').value.trim();
+  const contact = document.getElementById('dContact').value.trim();
+  const lastDonation = document.getElementById('dLast').value;
+  const available = document.getElementById('dAvail').checked;
+
+  if(!name || !city || !contact){
+    alert('Name, city, and contact are required to register.');
+    return;
+  }
+  donors.push({name, type, city, contact, lastDonation, available, ts: Date.now()});
+  const ok = await saveList('donors', donors);
+  if(!ok){ alert('Could not save — please try again.'); return; }
+  renderRegistry();
+  updateStats();
+  document.getElementById('dName').value='';
+  document.getElementById('dCity').value='';
+  document.getElementById('dContact').value='';
+  document.getElementById('dLast').value='';
+});
+
+document.getElementById('searchBtn').addEventListener('click', ()=>{
+  const needed = document.getElementById('sType').value;
+  const city = document.getElementById('sCity').value.trim().toLowerCase();
+  const availOnly = document.getElementById('sAvailOnly').checked;
+
+  let matches = donors.filter(d=> canDonateTo(d.type, needed));
+  if(city) matches = matches.filter(d=> d.city.toLowerCase().includes(city));
+  if(availOnly) matches = matches.filter(d=> d.available);
+  matches.sort((a,b)=>{
+    const ea = eligibilityLabel(a.lastDonation)==='Eligible now' ? 0:1;
+    const eb = eligibilityLabel(b.lastDonation)==='Eligible now' ? 0:1;
+    return ea-eb;
+  });
+  renderResults(matches, needed);
+});
+
+document.getElementById('postReqBtn').addEventListener('click', async ()=>{
+  const type = document.getElementById('rType').value;
+  const urgency = document.getElementById('rUrgency').value;
+  const location = document.getElementById('rLoc').value.trim();
+  const notes = document.getElementById('rNotes').value.trim();
+  if(!location){
+    alert('Enter a hospital or location for this request.');
+    return;
+  }
+  requests.push({type, urgency, location, notes, date:new Date().toLocaleString('en-US',{hour12:false}), ts:Date.now()});
+  const ok = await saveList('requests', requests);
+  if(!ok){ alert('Could not save — please try again.'); return; }
+  renderRequests();
+  updateStats();
+  document.getElementById('rLoc').value='';
+  document.getElementById('rNotes').value='';
+});
+
+document.getElementById('clearBtn').addEventListener('click', async ()=>{
+  if(!confirm('Clear ALL registry and request data for everyone using this app? This cannot be undone.')) return;
+  donors = []; requests = [];
+  await saveList('donors', donors);
+  await saveList('requests', requests);
+  renderRegistry(); renderRequests(); updateStats();
+  document.getElementById('resultsBox').innerHTML = '<div class="empty-state">Run a search to see matching, compatible donors.</div>';
+});
+
+// ---------- Init ----------
+(async ()=>{
+  donors = await loadList('donors');
+  requests = await loadList('requests');
+  renderRegistry();
+  renderRequests();
+  updateStats();
+})();
+</script>
+</body>
+</html>
